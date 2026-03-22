@@ -1,0 +1,17 @@
+export interface Position {
+    x: number;
+    y: number;
+}
+
+export interface PlayerState {
+    position: Position;
+    isJumping: boolean;
+    velocity: number;
+}
+
+export interface GameState {
+    isRunning: boolean;
+    isGameOver: boolean;
+    score: number;
+    speed: number;
+}
