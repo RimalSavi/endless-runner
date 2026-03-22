@@ -15,3 +15,8 @@ export interface GameState {
     score: number;
     speed: number;
 }
+
+export interface ObstacleType {
+    id: number;
+    position: Position;
+}
