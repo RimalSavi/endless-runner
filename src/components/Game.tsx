@@ -136,6 +136,7 @@ const Game = () => {
             const finalScore = Math.floor(scoreRef.current);
             setGameState(prev => {
                 const newBestScore = Math.max(finalScore, prev.bestScore);
+                saveBestScore(newBestScore);
                 return {
                     ...prev, 
                     isRunning: false, 
