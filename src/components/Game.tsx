@@ -19,10 +19,19 @@ const initialPlayerState: PlayerState = {
     velocity: 0,
 };
 
+const getBestScore = (): number => {
+    return parseInt(localStorage.getItem('bestScore') || '0', 10);
+};
+
+const saveBestScore = (score: number): void => {
+    localStorage.setItem('bestScore', score.toString());
+}
+
 const initialGameState: GameState = {
     isRunning: false,
     isGameOver: false,
     score: 0,
+    bestScore: getBestScore(),
     speed: 5,
 };
 
@@ -42,7 +51,11 @@ const Game = () => {
         playerRef.current = initialPlayerState;
         setObstacles([]);
         setPlayer(initialPlayerState);
-        setGameState({...initialGameState, isRunning: true});
+        setGameState(prev => ({
+            ...initialGameState, 
+            isRunning: true,
+            bestScore: prev.bestScore,
+        }));
     };
 
     const handleClick = useCallback(() => {
@@ -120,7 +133,17 @@ const Game = () => {
         setObstacles([...updatedObstacles]);
 
         if (hasCollision) {
-            setGameState(prev => ({ ...prev, isRunning: false, isGameOver: true }));
+            const finalScore = Math.floor(scoreRef.current);
+            setGameState(prev => {
+                const newBestScore = Math.max(finalScore, prev.bestScore);
+                return {
+                    ...prev, 
+                    isRunning: false, 
+                    isGameOver: true,
+                    score: finalScore,
+                    bestScore: newBestScore,
+                };
+            });
             return;
         }
 
@@ -174,7 +197,23 @@ const Game = () => {
                     fontSize: 32, 
                     textAlign: 'center' 
                 }}>
-                    {gameState.isGameOver ? 'Game Over! Click to restart' : 'Click to Start'}
+                    {gameState.isGameOver ? (
+                        <div>
+                            <div>Game Over!</div>
+                            <div style={{ fontSize: 24, margin: '10px 0', color: '#fbbf24' }}>
+                                Score: {gameState.bestScore}
+                            </div>
+                            <div style={{fontSize: 20, color: '#9ca3af'}}>
+                                Best: {gameState.bestScore}
+                            </div>
+                            <div style={{ fontSize: 18, marginTop: 20 }}>Click to restart</div>
+                        </div>
+                    ) : (
+                        <div>
+                            <div>Endless Runner</div>
+                            <div style={{ fontSize: 18, marginTop: 10, color: '#9ca3af' }}>Click to Start</div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

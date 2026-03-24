@@ -13,6 +13,7 @@ export interface GameState {
     isRunning: boolean;
     isGameOver: boolean;
     score: number;
+    bestScore: number;
     speed: number;
 }
 
