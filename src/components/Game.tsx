@@ -183,7 +183,8 @@ const Game = () => {
                     bottom: 0,
                     width: '100%',
                     height: GROUND_HEIGHT,
-                    backgroundColor: '#374151',
+                    backgroundColor: '#1a0a2e',
+                    borderTop: '3px solid #6d28d9'
                 }}
             />
 

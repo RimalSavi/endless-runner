@@ -17,10 +17,16 @@ const Player = ({ player }: PlayerProps) => {
                 bottom: player.position.y + GROUND_HEIGHT,
                 width: PLAYER_WIDTH,
                 height: PLAYER_HEIGHT,
-                backgroundColor: '#4ade80',
-                borderRadius: '8px',
+                fontSize: '40px',
+                lineHeight: '1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                userSelect: 'none'
             }}
-        />
+        >
+            🧙
+        </div>
     );
 };
 
