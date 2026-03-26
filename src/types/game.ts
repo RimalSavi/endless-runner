@@ -6,6 +6,7 @@ export interface Position {
 export interface PlayerState {
     position: Position;
     isJumping: boolean;
+    isSliding: boolean;
     velocity: number;
 }
 

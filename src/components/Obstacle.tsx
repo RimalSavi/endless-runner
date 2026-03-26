@@ -8,7 +8,7 @@ const OBSCTACLE_WIDTH = 30;
 const OBSTACLE_HEIGHT = 60;
 const GROUND_HEIGHT = 100;
 
-const Obsctacle = ({ position }: ObstacleProps) => {
+const Obstacle = ({ position }: ObstacleProps) => {
     return (
         <div 
             style={{
@@ -24,4 +24,4 @@ const Obsctacle = ({ position }: ObstacleProps) => {
     );
 };
 
-export default Obsctacle;
+export default Obstacle;

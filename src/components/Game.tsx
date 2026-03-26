@@ -1,15 +1,15 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameState, ObstacleType, PlayerState } from "../types/game";
 import useGameLoop from "../hooks/useGameLoop";
 import Player from "./Player";
-import Obsctacle from "./Obstacle";
+import Obstacle from "./Obstacle";
 
 const GROUND_HEIGHT = 100;
 const JUMP_FORCE = 18;
 const GRAVITY = 0.6;
 const PLAYER_WIDTH = 50;
 const PLAYER_HEIGHT = 50;
-const OBSCTACLE_WIDTH = 30;
+const OBSTACLE_WIDTH = 30;
 const OBSTACLE_HEIGHT = 60;
 const SPAWN_INTERVAL = 2500;
 const MAX_SPEED = 15;
@@ -18,6 +18,7 @@ const SPEED_INCREMENT = 0.001;
 const initialPlayerState: PlayerState = {
     position: { x: 100, y: 0},
     isJumping: false,
+    isSliding: false,
     velocity: 0,
 };
 
@@ -46,8 +47,10 @@ const Game = () => {
     const obstaclesRef = useRef<ObstacleType[]>([]);
     const playerRef = useRef<PlayerState>(initialPlayerState);
     const speedRef = useRef(initialGameState.speed);
+    const isRunningRef = useRef(false);
 
     const startGame = () => {
+        isRunningRef.current = true;
         scoreRef.current = 0;
         lastSpawnRef.current = 0;
         obstaclesRef.current = [];
@@ -83,7 +86,7 @@ const Game = () => {
         const playerTop = player.position.y + PLAYER_HEIGHT;
 
         const obstacleLeft = obstacle.position.x;
-        const obstacleRight = obstacle.position.x + OBSCTACLE_WIDTH;
+        const obstacleRight = obstacle.position.x + OBSTACLE_WIDTH;
         const obstacleBottom = 0;
         const obstacleTop = OBSTACLE_HEIGHT;
 
@@ -129,7 +132,7 @@ const Game = () => {
                 ...obs,
                 position: { ...obs.position, x: obs.position.x - speedRef.current },
             }))
-            .filter(obs => obs.position.x > -OBSCTACLE_WIDTH);
+            .filter(obs => obs.position.x > -OBSTACLE_WIDTH);
         
         const hasCollision = updatedObstacles.some(obs => checkCollision(currentPlayer, obs));
 
@@ -137,6 +140,7 @@ const Game = () => {
         setObstacles([...updatedObstacles]);
 
         if (hasCollision) {
+            isRunningRef.current = false;
             const finalScore = Math.floor(scoreRef.current);
             setGameState(prev => {
                 const newBestScore = Math.max(finalScore, prev.bestScore);
@@ -161,6 +165,47 @@ const Game = () => {
                 speed: newSpeed,
             };
         });
+    }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                e.preventDefault();
+                if (!isRunningRef.current) {
+                    startGame();
+                    return;
+                }
+                if (!playerRef.current.isJumping) {
+                    setPlayer(prev => {
+                        const updated = { ...prev, isJumping: true, velocity: JUMP_FORCE };
+                        playerRef.current = updated;
+                        return updated;
+                    });
+                }
+            }
+            if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+                e.preventDefault();
+
+                if (!playerRef.current.isJumping && isRunningRef.current) {
+                    setPlayer(prev => {
+                    const updated = { ...prev, isSliding: true };
+                    playerRef.current = updated;
+                    return updated;
+                });
+
+                    setTimeout(() => {
+                        setPlayer(prev => {
+                            const updated = { ...prev, isSliding: false };
+                            playerRef.current = updated;
+                            return updated;
+                        });
+                    }, 600);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
     useGameLoop(update, gameState.isRunning);
@@ -191,7 +236,7 @@ const Game = () => {
             <Player player={player} />
 
             {obstacles.map(obs => (
-                <Obsctacle key={obs.id} position={obs.position} />
+                <Obstacle key={obs.id} position={obs.position} />
             ))}
 
             <div style={{ position: 'absolute', top: 20, right: 20, color: 'white', fontSize: 24 }}>
@@ -212,7 +257,7 @@ const Game = () => {
                         <div>
                             <div>Game Over!</div>
                             <div style={{ fontSize: 24, margin: '10px 0', color: '#fbbf24' }}>
-                                Score: {gameState.bestScore}
+                                Score: {gameState.score}
                             </div>
                             <div style={{fontSize: 20, color: '#9ca3af'}}>
                                 Best: {gameState.bestScore}

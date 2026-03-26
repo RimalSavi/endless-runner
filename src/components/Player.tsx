@@ -15,14 +15,15 @@ const Player = ({ player }: PlayerProps) => {
                 position: 'absolute',
                 left: player.position.x,
                 bottom: player.position.y + GROUND_HEIGHT,
-                width: PLAYER_WIDTH,
+                width: player.isSliding ? PLAYER_WIDTH/2  : PLAYER_WIDTH,
                 height: PLAYER_HEIGHT,
-                fontSize: '40px',
+                fontSize: player.isSliding ? '24px' : '40px',
                 lineHeight: '1',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                userSelect: 'none'
+                userSelect: 'none',
+                transition: 'height 0.1s, font-size 0.1s',
             }}
         >
             🧙
