@@ -5,8 +5,8 @@ import Player from "./Player";
 import Obsctacle from "./Obstacle";
 
 const GROUND_HEIGHT = 100;
-const JUMP_FORCE = 15;
-const GRAVITY = 0.8;
+const JUMP_FORCE = 18;
+const GRAVITY = 0.6;
 const PLAYER_WIDTH = 50;
 const PLAYER_HEIGHT = 50;
 const OBSCTACLE_WIDTH = 30;
