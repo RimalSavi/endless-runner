@@ -11,7 +11,9 @@ const PLAYER_WIDTH = 50;
 const PLAYER_HEIGHT = 50;
 const OBSCTACLE_WIDTH = 30;
 const OBSTACLE_HEIGHT = 60;
-const SPAWN_INTERVAL = 2000;
+const SPAWN_INTERVAL = 2500;
+const MAX_SPEED = 15;
+const SPEED_INCREMENT = 0.001;
 
 const initialPlayerState: PlayerState = {
     position: { x: 100, y: 0},
@@ -43,12 +45,14 @@ const Game = () => {
     const lastSpawnRef = useRef(0);
     const obstaclesRef = useRef<ObstacleType[]>([]);
     const playerRef = useRef<PlayerState>(initialPlayerState);
+    const speedRef = useRef(initialGameState.speed);
 
     const startGame = () => {
         scoreRef.current = 0;
         lastSpawnRef.current = 0;
         obstaclesRef.current = [];
         playerRef.current = initialPlayerState;
+        speedRef.current = initialGameState.speed;
         setObstacles([]);
         setPlayer(initialPlayerState);
         setGameState(prev => ({
@@ -123,7 +127,7 @@ const Game = () => {
         const updatedObstacles = obstaclesRef.current
             .map(obs => ({
                 ...obs,
-                position: { ...obs.position, x: obs.position.x - 5 },
+                position: { ...obs.position, x: obs.position.x - speedRef.current },
             }))
             .filter(obs => obs.position.x > -OBSCTACLE_WIDTH);
         
@@ -148,10 +152,15 @@ const Game = () => {
             return;
         }
 
-        setGameState(prev => ({
-            ...prev,
-            score: Math.floor(scoreRef.current),
-        }));
+        setGameState(prev => {
+            const newSpeed = Math.min(prev.speed + SPEED_INCREMENT, MAX_SPEED);
+            speedRef.current = newSpeed;
+            return {
+                ...prev,
+                score: Math.floor(scoreRef.current),
+                speed: newSpeed,
+            };
+        });
     }, []);
 
     useGameLoop(update, gameState.isRunning);
