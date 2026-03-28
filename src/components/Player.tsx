@@ -1,12 +1,9 @@
+import { PLAYER_CONFIG } from "../constants/gameConfig";
 import type { PlayerState } from "../types/game";
 
 interface PlayerProps {
     player: PlayerState;
 }
-
-const PLAYER_WIDTH = 50;
-const PLAYER_HEIGHT = 50;
-const GROUND_HEIGHT = 100;
 
 const Player = ({ player }: PlayerProps) => {
     return (
@@ -14,10 +11,10 @@ const Player = ({ player }: PlayerProps) => {
             style= {{
                 position: 'absolute',
                 left: player.position.x,
-                bottom: player.position.y + GROUND_HEIGHT,
-                width: player.isSliding ? PLAYER_WIDTH/2  : PLAYER_WIDTH,
-                height: PLAYER_HEIGHT,
-                fontSize: player.isSliding ? '24px' : '40px',
+                bottom: player.position.y + PLAYER_CONFIG.groundHeight,
+                width: PLAYER_CONFIG.width,
+                height: player.isSliding ? PLAYER_CONFIG.slidingHeight: PLAYER_CONFIG.height,
+                fontSize: player.isSliding ? PLAYER_CONFIG.slidingFontSize : PLAYER_CONFIG.normalFontSize,
                 lineHeight: '1',
                 display: 'flex',
                 alignItems: 'center',

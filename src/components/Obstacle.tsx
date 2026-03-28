@@ -1,26 +1,31 @@
-import type { Position } from "../types/game";
+import { GAME_CONFIG, OBSTACLE_CONFIG } from "../constants/gameConfig";
+import type { ObstacleType } from "../types/game";
 
 interface ObstacleProps {
-    position: Position;
+    obstacle: ObstacleType
 }
 
-const OBSCTACLE_WIDTH = 30;
-const OBSTACLE_HEIGHT = 60;
-const GROUND_HEIGHT = 100;
+const Obstacle = ({ obstacle }: ObstacleProps) => {
+    const config = OBSTACLE_CONFIG[obstacle.type];
 
-const Obstacle = ({ position }: ObstacleProps) => {
     return (
         <div 
             style={{
                 position: 'absolute',
-                left: position.x,
-                bottom: GROUND_HEIGHT,
-                width: OBSCTACLE_WIDTH,
-                height: OBSTACLE_HEIGHT,
-                backgroundColor: '#ef4444',
-                borderRadius: '4px',
+                left: obstacle.position.x,
+                bottom: GAME_CONFIG.groundHeight + config.bottom,
+                width: config.bottom,
+                height: config.height,
+                fontSize: '36px',
+                lineHeight: '1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                userSelect: 'none',
             }}
-        />
+        >
+            {config.emoji}
+        </div>
     );
 };
 

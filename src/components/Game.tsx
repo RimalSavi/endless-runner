@@ -3,17 +3,7 @@ import type { GameState, ObstacleType, PlayerState } from "../types/game";
 import useGameLoop from "../hooks/useGameLoop";
 import Player from "./Player";
 import Obstacle from "./Obstacle";
-
-const GROUND_HEIGHT = 100;
-const JUMP_FORCE = 18;
-const GRAVITY = 0.6;
-const PLAYER_WIDTH = 50;
-const PLAYER_HEIGHT = 50;
-const OBSTACLE_WIDTH = 30;
-const OBSTACLE_HEIGHT = 60;
-const SPAWN_INTERVAL = 2500;
-const MAX_SPEED = 15;
-const SPEED_INCREMENT = 0.001;
+import { GAME_CONFIG, OBSTACLE_CONFIG, PLAYER_CONFIG } from "../constants/gameConfig";
 
 const initialPlayerState: PlayerState = {
     position: { x: 100, y: 0},
@@ -35,7 +25,7 @@ const initialGameState: GameState = {
     isGameOver: false,
     score: 0,
     bestScore: getBestScore(),
-    speed: 5,
+    speed: GAME_CONFIG.initialSpeed,
 };
 
 const Game = () => {
@@ -55,7 +45,7 @@ const Game = () => {
         lastSpawnRef.current = 0;
         obstaclesRef.current = [];
         playerRef.current = initialPlayerState;
-        speedRef.current = initialGameState.speed;
+        speedRef.current = GAME_CONFIG.initialSpeed;
         setObstacles([]);
         setPlayer(initialPlayerState);
         setGameState(prev => ({
@@ -72,7 +62,7 @@ const Game = () => {
         }
         if (!playerRef.current.isJumping) {
             setPlayer(prev => {
-                const updated = { ...prev, isJumping: true, velocity: JUMP_FORCE };
+                const updated = { ...prev, isJumping: true, velocity: PLAYER_CONFIG.jumpForce };
                 playerRef.current = updated;
                 return updated;
             });
@@ -80,15 +70,17 @@ const Game = () => {
     }, [gameState.isRunning]);
 
     const checkCollision = (player: PlayerState, obstacle: ObstacleType): boolean => {
-        const playerLeft = player.position.x;
-        const playerRight = player.position.x + PLAYER_WIDTH;
-        const playerBottom = player.position.y;
-        const playerTop = player.position.y + PLAYER_HEIGHT;
+        const config = OBSTACLE_CONFIG[obstacle.type];
 
-        const obstacleLeft = obstacle.position.x;
-        const obstacleRight = obstacle.position.x + OBSTACLE_WIDTH;
-        const obstacleBottom = 0;
-        const obstacleTop = OBSTACLE_HEIGHT;
+        const playerLeft = player.position.x + 8;
+        const playerRight = player.position.x + PLAYER_CONFIG.width - 8;
+        const playerBottom = player.position.y;
+        const playerTop = player.position.y + (player.isSliding ? PLAYER_CONFIG.slidingHeight : PLAYER_CONFIG.height);
+
+        const obstacleLeft = obstacle.position.x + 4;
+        const obstacleRight = obstacle.position.x + config.width - 4;
+        const obstacleBottom = config.bottom;
+        const obstacleTop = config.bottom + config.height;
 
         return (
             playerRight > obstacleLeft &&
@@ -104,7 +96,7 @@ const Game = () => {
 
         setPlayer(prev => {
             if (!prev.isJumping) return prev;
-            const newVelocity = prev.velocity - GRAVITY;
+            const newVelocity = prev.velocity - PLAYER_CONFIG.gravity;
             const newY = Math.max(0, prev.position.y + newVelocity);
             const isJumping = newY > 0;
             const updated = {
@@ -117,11 +109,14 @@ const Game = () => {
             return updated;
         });
 
-        if (lastSpawnRef.current > SPAWN_INTERVAL) {
+        if (lastSpawnRef.current > GAME_CONFIG.spawnInterval) {
             lastSpawnRef.current = 0;
+            const types = Object.keys(OBSTACLE_CONFIG) as Array<keyof typeof OBSTACLE_CONFIG>
+            const type = types[Math.floor(Math.random() * types.length)];
             const newObstacle: ObstacleType = {
                 id: Date.now(),
                 position: { x: window.innerWidth, y: 0 },
+                type,
             };
             obstaclesRef.current = [...obstaclesRef.current, newObstacle];
         }
@@ -132,7 +127,7 @@ const Game = () => {
                 ...obs,
                 position: { ...obs.position, x: obs.position.x - speedRef.current },
             }))
-            .filter(obs => obs.position.x > -OBSTACLE_WIDTH);
+            .filter(obs => obs.position.x > -Math.max(...Object.values(OBSTACLE_CONFIG).map(c => c.width)));
         
         const hasCollision = updatedObstacles.some(obs => checkCollision(currentPlayer, obs));
 
@@ -157,7 +152,7 @@ const Game = () => {
         }
 
         setGameState(prev => {
-            const newSpeed = Math.min(prev.speed + SPEED_INCREMENT, MAX_SPEED);
+            const newSpeed = Math.min(prev.speed + GAME_CONFIG.speedIncrement, GAME_CONFIG.maxSpeed);
             speedRef.current = newSpeed;
             return {
                 ...prev,
@@ -177,7 +172,7 @@ const Game = () => {
                 }
                 if (!playerRef.current.isJumping) {
                     setPlayer(prev => {
-                        const updated = { ...prev, isJumping: true, velocity: JUMP_FORCE };
+                        const updated = { ...prev, isJumping: true, velocity: PLAYER_CONFIG.jumpForce };
                         playerRef.current = updated;
                         return updated;
                     });
@@ -227,7 +222,7 @@ const Game = () => {
                     position: 'absolute',
                     bottom: 0,
                     width: '100%',
-                    height: GROUND_HEIGHT,
+                    height: GAME_CONFIG.groundHeight,
                     backgroundColor: '#1a0a2e',
                     borderTop: '3px solid #6d28d9'
                 }}
@@ -236,7 +231,7 @@ const Game = () => {
             <Player player={player} />
 
             {obstacles.map(obs => (
-                <Obstacle key={obs.id} position={obs.position} />
+                <Obstacle key={obs.id} obstacle={obs} />
             ))}
 
             <div style={{ position: 'absolute', top: 20, right: 20, color: 'white', fontSize: 24 }}>
