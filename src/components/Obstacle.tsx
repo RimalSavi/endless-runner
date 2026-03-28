@@ -7,6 +7,7 @@ interface ObstacleProps {
 
 const Obstacle = ({ obstacle }: ObstacleProps) => {
     const config = OBSTACLE_CONFIG[obstacle.type];
+    const isCeiling = 'fromCeiling' in config && config.fromCeiling;
 
     return (
         <div 
@@ -22,6 +23,7 @@ const Obstacle = ({ obstacle }: ObstacleProps) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 userSelect: 'none',
+                transform: isCeiling ? 'rotate(180deg)' : undefined,
             }}
         >
             {config.emoji}

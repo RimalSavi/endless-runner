@@ -24,5 +24,5 @@ export interface GameState {
 export interface ObstacleType {
     id: number;
     position: Position;
-    type: 'skull' | 'bat'
+    type: 'skull' | 'bat' | 'sword'
 }

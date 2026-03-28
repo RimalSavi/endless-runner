@@ -24,6 +24,13 @@ export const OBSTACLE_CONFIG = {
         bottom: 30,
         emoji: '🦇'
     },
+    sword: {
+        width: 40,
+        height: 60,
+        bottom: 0,
+        emoji: '⚔️',
+        fromCeiling: true,
+    }
 } as const;
 
 export const GAME_CONFIG = {

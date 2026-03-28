@@ -75,8 +75,8 @@ const Game = () => {
     const checkCollision = (player: PlayerState, obstacle: ObstacleType): boolean => {
         const config = OBSTACLE_CONFIG[obstacle.type];
 
-        const playerLeft = player.position.x + 8;
-        const playerRight = player.position.x + PLAYER_CONFIG.width - 8;
+        const playerLeft = obstacle.type === 'sword' ? player.position.x : player.position.x + 8;
+        const playerRight = obstacle.type === 'sword' ? player.position.x + PLAYER_CONFIG.width : player.position.x + PLAYER_CONFIG.width - 8;
         const playerBottom = player.position.y;
         const playerTop = player.position.y + (player.isSliding ? PLAYER_CONFIG.slidingHeight : PLAYER_CONFIG.height);
 
