@@ -19,7 +19,7 @@ export const OBSTACLE_CONFIG = {
     bat: {
         width: 40,
         height: 40,
-        bottom: 90,
+        bottom: 30,
         emoji: '🦇'
     },
 } as const;
