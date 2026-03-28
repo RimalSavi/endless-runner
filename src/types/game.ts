@@ -8,6 +8,8 @@ export interface PlayerState {
     isJumping: boolean;
     isSliding: boolean;
     velocity: number;
+    health: number;
+    isInvincible: boolean;
 }
 
 export interface GameState {
@@ -16,6 +18,7 @@ export interface GameState {
     score: number;
     bestScore: number;
     speed: number;
+    level: number;
 }
 
 export interface ObstacleType {

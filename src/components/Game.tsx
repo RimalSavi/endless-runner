@@ -10,6 +10,8 @@ const initialPlayerState: PlayerState = {
     isJumping: false,
     isSliding: false,
     velocity: 0,
+    health: PLAYER_CONFIG.maxHealth,
+    isInvincible: false,
 };
 
 const getBestScore = (): number => {
@@ -26,6 +28,7 @@ const initialGameState: GameState = {
     score: 0,
     bestScore: getBestScore(),
     speed: GAME_CONFIG.initialSpeed,
+    level: 1,
 };
 
 const Game = () => {
@@ -134,21 +137,43 @@ const Game = () => {
         obstaclesRef.current = updatedObstacles;
         setObstacles([...updatedObstacles]);
 
-        if (hasCollision) {
-            isRunningRef.current = false;
-            const finalScore = Math.floor(scoreRef.current);
-            setGameState(prev => {
-                const newBestScore = Math.max(finalScore, prev.bestScore);
-                saveBestScore(newBestScore);
-                return {
-                    ...prev, 
-                    isRunning: false, 
-                    isGameOver: true,
-                    score: finalScore,
-                    bestScore: newBestScore,
+        if (hasCollision && !playerRef.current.isInvincible) {
+            const newHealth = playerRef.current.health - 1;
+
+            if (newHealth <= 0) {
+                isRunningRef.current = false;
+                const finalScore = Math.floor(scoreRef.current);
+                setGameState(prev => {
+                    const newBestScore = Math.max(finalScore, prev.bestScore);
+                    saveBestScore(newBestScore);
+                    return {
+                        ...prev, 
+                        isRunning: false, 
+                        isGameOver: true,
+                        score: finalScore,
+                        bestScore: newBestScore,
+                    };
+                });
+                return;
+            }
+
+            setPlayer(prev => {
+                const updated = {
+                    ...prev,
+                    health: newHealth,
+                    isInvincible: true,
                 };
+                playerRef.current = updated;
+                return updated;
             });
-            return;
+
+            setTimeout(() => {
+                setPlayer(prev => {
+                    const updated = {...prev, isInvincible: false};
+                    playerRef.current = updated;
+                    return updated;
+                });
+            }, PLAYER_CONFIG.invincibilityDuration);
         }
 
         setGameState(prev => {

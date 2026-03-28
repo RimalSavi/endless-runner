@@ -6,7 +6,9 @@ export const PLAYER_CONFIG = {
     normalFontSize: '40px',
     groundHeight: 100,
     jumpForce: 18,
-    gravity: 0.6
+    gravity: 0.6,
+    maxHealth: 3,
+    invincibilityDuration: 2000,
 } as const;
 
 export const OBSTACLE_CONFIG = {
